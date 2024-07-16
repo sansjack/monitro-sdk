@@ -1,0 +1,31 @@
+{
+  "name": "monitro",
+  "version": "1.0.0",
+  "description": "monitro.dev offical SDK",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "API_URL=http://localhost:5173/api/v1 bun test/test.js",
+    "build:dev": "API_URL=http://localhost:5173/api/v1 npm package index.js --out-dir dist",
+    "build:prod": "API_URL=http://monitro.dev/api/v1 npm package index.js --out-dir dist"
+  },
+  "author": "sansjack",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sansjack/monitro-sdk.git"
+  },
+  "keywords": [
+    "monitoring",
+    "sdk",
+    "monitro"
+  ],
+  "bugs": {
+    "url": "https://github.com/sansjack/monitro-sdk/issues"
+  },
+  "homepage": "https://github.com/sansjack/monitro-sdk#readme"
+}
