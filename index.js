@@ -91,7 +91,6 @@ class Monitro {
     } catch (error) {
       console.log(API_URL)
       console.error('Failed to send event to monitro', error)
-      console.error('Failed to send event to monitro')
       return false
     }
   }
