@@ -130,4 +130,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /test
+
+src/
+biome.json
+rollup.config.js
 bun.lockb
+tsconfig.json

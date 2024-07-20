@@ -1,13 +1,15 @@
 /**
  * Monitro class for monitoring and logging messages.
+ * TODO: refactor hehehe....
  */
-const API_URL = 'http://localhost:5173/api/v1'
+
+const API_URL = process.env.API_URL
 
 class Monitro {
   /**
  * @typedef {Object} Options
  * @property {boolean} [hookExceptions] [hookExceptions=true] - If this is true, any uncaught exceptions will be sent as an event.
- * @property {boolean} [waitForResponse] [waitForResponse=false] - The default is false but if this is true the function will wait for a response from the server before returning, if you do not await the event may never get sent! For serverless this maybe good to disable to prevent long function exectution times.
+ * @property {boolean} [waitForResponse] [waitForResponse=true] - if this is false the function will not wait for a response from the server, if you do not await the event may never get sent! For serverless this maybe good to disable to prevent long function exectution times. But you wont be able to handle or see if it errors!
  * @property {number} [timeout] [timeout=5000] - The timeout in milliseconds for the request to the server Default is 5000ms
  */
   /**
@@ -41,7 +43,7 @@ class Monitro {
     }
 
     if (this.options.waitForResponse === undefined) {
-      this.options.waitForResponse = false
+      this.options.waitForResponse = true
     }
 
     if (this.options.hookExceptions === undefined) {
@@ -51,7 +53,7 @@ class Monitro {
     if (this.options.hookExceptions) {
       const uncaught = true
       process.on('uncaughtException', (err) => {
-        this.send(
+        this.#send(
           err.message,
           'error',
           'Uncaught Exception',
@@ -62,7 +64,7 @@ class Monitro {
     }
   }
 
-  async sendDataToApi(apiKey, data) {
+  async #sendDataToApi(apiKey, data) {
     try {
       const responsePromise = fetch(`${API_URL}/send`, {
         method: 'POST',
@@ -71,20 +73,21 @@ class Monitro {
           'X-API-Key': apiKey
         },
         body: JSON.stringify(data),
-        timeout: this.options.timeout,
+        signal: AbortSignal.timeout(this.options.timeout) ,
       })
   
       if (this.options.waitForResponse) {
-        const resolved = await responsePromise
-  
-        if (!resolved.ok) {
-          console.error('Failed to send event to monitro')
+        const response = await responsePromise
+        const responseData = await response.json()
+
+        if (!response.ok) {
+          console.error(responseData.message)
           return false
         }
         console.log('Successfully sent event to monitro')
         return true
       } 
-        console.log('Event sent to monitro without waiting for response')
+        console.log('Event sent to monitro.')
         return true
       
   
@@ -101,9 +104,9 @@ class Monitro {
    * @param {string} message - Further details of the log message.
    * @param {Object} data - Additional data to log.
    */
-  async send(name, level, message, data , uncaught = false) {
+  async #send(name, level, message, data , uncaught = false) {
     try {
-      this.sendDataToApi(this.apiKey, {
+      this.#sendDataToApi(this.apiKey, {
         name: name,
         uncaught,
         service_name: this.serviceName,
@@ -121,12 +124,11 @@ class Monitro {
   /**
    * Sends a info event.
    * @param {string} name - The Name of the monitor
-   * @param {string} level - The log level (e.g., 'info', 'warning', 'error').
    * @param {string} message - Further details of the log message.
    * @param {Object | undefined} data - Additional data to log.
    */
   async info(name, message, data = undefined) {
-    this.sendDataToApi(this.apiKey, {
+    this.#sendDataToApi(this.apiKey, {
       name: name,
       service_name: this.serviceName,
       level: 'info',
@@ -138,12 +140,11 @@ class Monitro {
   /**
    * Sends a warning event.
    * @param {string} name - The Name of the monitor
-   * @param {string} level - The log level (e.g., 'info', 'warning', 'error').
    * @param {string} message - Further details of the log message.
    * @param {Object | undefined} data - Additional data to log.
    */
   async warn(name, message, data = undefined) {
-    this.sendDataToApi(this.apiKey, {
+    this.#sendDataToApi(this.apiKey, {
       name: name,
       service_name: this.serviceName,
       level: 'warning',
@@ -155,12 +156,11 @@ class Monitro {
   /**
    * Sends a error event.
    * @param {string} name - The Name of the monitor
-   * @param {string} level - The log level (e.g., 'info', 'warning', 'error').
    * @param {string} message - Further details of the log message.
    * @param {Object | undefined} data - Additional data to log.
    */
   async error(name, message, data = undefined) {
-    this.sendDataToApi(this.apiKey, {
+    this.#sendDataToApi(this.apiKey, {
       name: name,
       service_name: this.serviceName,
       level: 'error',

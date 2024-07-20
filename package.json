@@ -1,19 +1,27 @@
 {
   "name": "monitro",
-  "version": "1.0.0",
-  "description": "monitro.dev offical SDK",
+  "version": "1.0.13",
+  "description": "monitro.dev official SDK",
   "type": "module",
-  "main": "index.js",
+  "types": "types/index.d.ts",
+  "main": "dist/bundle.js",
+  "module": "dist/bundle.js",
   "scripts": {
     "dev": "API_URL=http://localhost:5173/api/v1 bun test/test.js",
-    "build:dev": "API_URL=http://localhost:5173/api/v1 npm package index.js --out-dir dist",
-    "build:prod": "API_URL=http://monitro.dev/api/v1 npm package index.js --out-dir dist"
+    "build": "rollup -c && tsc",
+    "build:dev": "API_URL=http://localhost:5173/api/v1 npm run build",
+    "publish:prod": "API_URL=https://monitro.dev/api/v1 npm run build && npm publish",
+    "prepublishOnly": "API_URL=https://monitro.dev/api/v1 npm run build"
   },
   "author": "sansjack",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3"
+    "@biomejs/biome": "^1.8.3",
+    "@rollup/plugin-replace": "^5.0.7",
+    "rollup": "^4.19.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "typescript": "^5.5.3"
   },
   "repository": {
     "type": "git",
@@ -21,11 +29,14 @@
   },
   "keywords": [
     "monitoring",
+    "javascript monitoring",
     "sdk",
-    "monitro"
+    "monitro",
+    "monitro.dev",
+    "monitro sdk"
   ],
   "bugs": {
     "url": "https://github.com/sansjack/monitro-sdk/issues"
   },
-  "homepage": "https://github.com/sansjack/monitro-sdk#readme"
+  "homepage": "https://monitro.dev"
 }

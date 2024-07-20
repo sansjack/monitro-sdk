@@ -1,0 +1,14 @@
+{
+    "include": ["src/**/*.js"],
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+        "allowJs": true,
+        "declaration": true,      // Generate .d.ts files
+        "emitDeclarationOnly": true, // Only emit .d.ts files
+        "outDir": "types",    // Output directory for .d.ts files
+        "checkJs": true,      // Check JavaScript files
+        "target": "ES6",      // JavaScript version to compile to
+        "module": "ES6",       // Module system (adjust as needed)
+        "moduleResolution": "node"
+    }
+}
