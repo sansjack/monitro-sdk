@@ -11,6 +11,8 @@ class Monitro {
  * @property {boolean} [hookExceptions] [hookExceptions=true] - If this is true, any uncaught exceptions will be sent as an event.
  * @property {boolean} [waitForResponse] [waitForResponse=true] - if this is false the function will not wait for a response from the server, if you do not await the event may never get sent! For serverless this maybe good to disable to prevent long function exectution times. But you wont be able to handle or see if it errors!
  * @property {number} [timeout] [timeout=5000] - The timeout in milliseconds for the request to the server Default is 5000ms
+ * @property {boolean} [dev] [dev=false] - If this is true, no events will be sent to the server. This is useful for development and testing.
+ * @property {boolean} [devWarning] [devWarning=true] - If this is true, a warning will be logged when developer mode is activated and an event was attempted to be sent.
  */
   /**
    * 
@@ -38,6 +40,13 @@ class Monitro {
      */
     this.options = options
 
+    if (this.options.dev === undefined) {
+      this.options.dev = false
+    }
+    if (this.options.devWarning === undefined) {
+      this.options.devWarning = true
+    }
+
     if (this.options.timeout === undefined) {
       this.options.timeout = 5000
     }
@@ -63,9 +72,31 @@ class Monitro {
       })
     }
   }
+  
+  async #send(name, level, message, data , uncaught = false) {
+    try {
+      this.#sendDataToApi(this.apiKey, {
+        name: name,
+        uncaught,
+        service_name: this.serviceName,
+        level,
+        message,
+        data,
+      })
+    }
+    catch(error){
+      console.error('Monitro failed to send event', error)
+    }
+  }
 
   async #sendDataToApi(apiKey, data) {
     try {
+      if (this.options.dev) {
+        if (this.options.devWarning) {
+          console.warn('Developer Mode Activated, no events will be sent monitro')
+        }
+        return true
+      }
       const responsePromise = fetch(`${API_URL}/send`, {
         method: 'POST',
         headers: {
@@ -97,30 +128,7 @@ class Monitro {
       return false
     }
   }
-  /**
-   * Sends an event.
-   * @param {string} name - The Name of the monitor
-   * @param {string} level - The log level (e.g., 'info', 'warning', 'error').
-   * @param {string} message - Further details of the log message.
-   * @param {Object} data - Additional data to log.
-   */
-  async #send(name, level, message, data , uncaught = false) {
-    try {
-      this.#sendDataToApi(this.apiKey, {
-        name: name,
-        uncaught,
-        service_name: this.serviceName,
-        level,
-        message,
-        data,
-      })
-    }
-    catch(error){
-      console.error('Monitro failed to send event', error)
-    }
-  }
    
-
   /**
    * Sends a info event.
    * @param {string} name - The Name of the monitor
