@@ -1,6 +1,6 @@
 # Monitro SDK 
 
-This is the offical sdk for [monitro.dev](https://monitro.dev)
+This is the official sdk for [monitro.dev](https://monitro.dev)
 Currently this package is in beta, so expect breaking changes.
 ## Installation
 
